@@ -18,18 +18,18 @@ va_start(list, format);
 while (*format)
 {
 if (*format != '%')
-wr_counter(format, counter);
+wr_counter(format, &counter);
 else
 {
 format++;
 if (*format == '\0')
 break;
 if (*format == '%')
-wr_counter(format, counter);
+wr_counter(format, &counter);
 else if (*format == 'c')
 {
 c = va_arg(list, int);
-wr_counter(&c, counter);
+wr_counter(&c, &counter);
 }
 else if (*format == 's')
 {
@@ -50,8 +50,8 @@ return (counter);
  * @incr: counter to be 8ncrimented
  * Return: void nothing
  */
-void wr_counter(const char *s, int incr)
+void wr_counter(const char *s, int *incr)
 {
 write(1, s, 1);
-incr++;
+(*incr)++;
 }

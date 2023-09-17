@@ -9,6 +9,6 @@
 
 /* function prototypes */
 int _printf(const char *format, ...);
-void wr_counter(const char *s, int incr);
+void wr_counter(const char *s, int *incr);
 
 #endif
