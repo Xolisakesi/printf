@@ -1,8 +1,14 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+/* Header files */
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
 
-void _printf(const char *format, ...);
+/* function prototypes */
+int _printf(const char *format, ...);
+void wr_counter(const char *s, int incr);
 
-#endif 
+#endif
