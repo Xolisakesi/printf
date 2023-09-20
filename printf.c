@@ -147,6 +147,7 @@ return (pc + prints(out, s, width, pad));
  */
 int print(char **out, const char *format, va_list args)
 {
+/*extensive work still needs to be done here braking this function into more functions" functions.c" and a struct */
 int width, pad;
 int pc = 0;
 const char *fmt = format;
@@ -214,9 +215,9 @@ if (*fmt == 'o') {
 pc += printi(out, va_arg(args, int), 8, 0, width, pad, 'a');
 continue;
 }
-/* Handle %p format specifier for pointers*/
 if (*fmt == 'p')
 {
+/* make a function here to Handle %p format specifier for pointers*/
 void *address;
 char addr_str[PRINT_BUF_LEN];
 unsigned long addr_value, temp;
@@ -247,6 +248,52 @@ addr_str[i--] = '0';
 }
 addr_str[num_digits + 2] = '\0';
 pc += prints(out, addr_str, width, pad);
+continue;
+}
+if (*fmt == 'b') 
+{ /* make a function her to Handle %b format specifier for binary*/
+char binary_str[33];
+int num = va_arg(args, int);
+int binary[32]; 
+int j, i = 0;
+
+if (num == 0) 
+{
+binary[i++] = 0;
+} 
+else 
+{
+while (num > 0) {
+binary[i++] = num % 2;
+num /= 2;
+}
+} 
+for (j = i - 1; j >= 0; j--) 
+{
+binary_str[i - 1 - j] = '0' + binary[j];
+}
+binary_str[i] = '\0';
+pc += prints(out, binary_str, width, pad);
+continue;
+}
+if (*fmt == 'S') { /*need a function to Handle %S format specifier for strings with non-printable characters*/
+char hex[5];
+char *str = va_arg(args, char *);
+int i, len = strlen(str);
+
+for (i = 0; i < len; i++) 
+{
+if ((str[i] < 32 || str[i] >= 127) && str[i] != '\0') 
+{ 
+snprintf(hex, sizeof(hex), "\\x%02X", (unsigned char)str[i]);
+pc += prints(out, hex, width, pad);
+} 
+else 
+{
+printchar(out, str[i]);
+pc++;
+}
+}
 continue;
 }
 
