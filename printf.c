@@ -250,33 +250,29 @@ addr_str[num_digits + 2] = '\0';
 pc += prints(out, addr_str, width, pad);
 continue;
 }
-if (*fmt == 'b') 
-{ /* make a function her to Handle %b format specifier for binary*/
-char binary_str[33];
-int num = va_arg(args, int);
-int binary[32]; 
-int j, i = 0;
-
-if (num == 0) 
-{
-binary[i++] = 0;
-} 
-else 
-{
-while (num > 0) {
-binary[i++] = num % 2;
-num /= 2;
-}
-} 
-for (j = i - 1; j >= 0; j--) 
-{
-binary_str[i - 1 - j] = '0' + binary[j];
-}
-binary_str[i] = '\0';
-pc += prints(out, binary_str, width, pad);
+if (*fmt == 'b') {
+unsigned int b = va_arg(args, unsigned int);
+pc += printi(out, b, 2, 0, width, pad, 'a');
 continue;
 }
-if (*fmt == 'S') { /*need a function to Handle %S format specifier for strings with non-printable characters*/
+if (*fmt == 'u') {
+pc += printi(out, va_arg(args, int), 10, 0, width, pad, 'a');
+continue;
+}
+if (*fmt == 'd' && *(fmt + 1) == 'l') { 
+long d = va_arg(args, long);
+pc += printi(out, d, 10, 1, width, pad, 'a');
+fmt++; 
+continue;
+}
+if (*fmt == 'd' && *(fmt + 1) == 'h') { 
+short d = va_arg(args, int);  
+pc += printi(out, d, 10, 1, width, pad, 'a');
+fmt++; 
+continue;
+}
+
+if (*fmt == 'S') { 
 char hex[5];
 char *str = va_arg(args, char *);
 int i, len = strlen(str);
