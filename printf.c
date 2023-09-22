@@ -2,7 +2,7 @@
 /**
  * _printf - Custom printf function with format string support.                                                  * @format: The format string.                           * @...: Variable arguments.                             * Return: Number of characters printed.                 */
 
-int _printf(const char *format, ...)                    
+int _printf(const char *format, ...)
 {
 int result;
 va_list args;
@@ -255,36 +255,107 @@ unsigned int b = va_arg(args, unsigned int);
 pc += printi(out, b, 2, 0, width, pad, 'a');
 continue;
 }
+if (*fmt == 'r')
+{
+int i;
+char *str = va_arg(args, char *);
+int len = strlen(str);
+for (i = len - 1; i >= 0; i--)
+{
+printchar(out, str[i]);
+++pc;
+}
+continue;
+}
+if (*fmt == 'R')
+{
+char c;
+char *str = va_arg(args, char *);
+int i, len = strlen(str);
+for (i = 0; i < len; i++)
+{
+c = str[i];
+if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+{
+char base = (c >= 'a') ? 'a' : 'A';
+printchar(out, (c - base + 13) % 26 + base);
+}
+else
+{
+printchar(out, c);
+}
+++pc;
+}
+continue;
+}
 if (*fmt == 'u') {
 pc += printi(out, va_arg(args, int), 10, 0, width, pad, 'a');
 continue;
 }
-if (*fmt == 'd' && *(fmt + 1) == 'l') { 
-long d = va_arg(args, long);
-pc += printi(out, d, 10, 1, width, pad, 'a');
-fmt++; 
-continue;
+if (*fmt == 'l') 
+{
+++fmt; 
+if (*fmt == 'd' || *fmt == 'i') 
+{
+long int li = va_arg(args, long int);
+pc += printi(out,li, 10, (li < 0), width, pad, 'a');
 }
-if (*fmt == 'd' && *(fmt + 1) == 'h') { 
-short d = va_arg(args, int);  
-pc += printi(out, d, 10, 1, width, pad, 'a');
-fmt++; 
+else if (*fmt == 'o') 
+{
+unsigned long int uli = va_arg(args, unsigned long int);
+pc += printi(out, (int)uli, 8, 0, width, pad, 'a');
+}
+else if (*fmt == 'u') 
+{
+unsigned long int uli = va_arg(args, unsigned long int);
+pc += printi(out, (int)uli, 10, 0, width, pad, 'a');
+}
+else if (*fmt == 'x' || *fmt == 'X') 
+{
+unsigned long int uli = va_arg(args, unsigned long int);
+pc += printi(out, (int)uli, 16, 0, width, pad, (*fmt == 'X' ? 'A' : 'a'));
+}
 continue;
 }
 
-if (*fmt == 'S') { 
+if (*fmt == 'h') 
+{
+++fmt; /* Move past 'h'*/
+if (*fmt == 'd' || *fmt == 'i') {
+short int hi = va_arg(args, int);
+pc += printi(out, (int)hi, 10, (hi < 0), width, pad, 'a');
+}
+else if (*fmt == 'o') {
+unsigned short int uhi = va_arg(args, unsigned int);
+pc += printi(out, (int)uhi, 8, 0, width, pad, 'a');
+}
+else if (*fmt == 'u') 
+{
+unsigned short int uhi = va_arg(args, unsigned int);
+pc += printi(out, (int)uhi, 10, 0, width, pad, 'a');
+}
+else if (*fmt == 'x' || *fmt == 'X') 
+{
+unsigned short int uhi = va_arg(args, unsigned int);
+pc += printi(out, (int)uhi, 16, 0, width, pad, (*fmt == 'X' ? 'A' : 'a'));
+}
+/* Handle other format specifiers or modifiers as needed...*/
+continue;
+}
+
+if (*fmt == 'S') {
 char hex[5];
 char *str = va_arg(args, char *);
 int i, len = strlen(str);
 
-for (i = 0; i < len; i++) 
+for (i = 0; i < len; i++)
 {
-if ((str[i] < 32 || str[i] >= 127) && str[i] != '\0') 
-{ 
+if ((str[i] < 32 || str[i] >= 127) && str[i] != '\0')
+{
 snprintf(hex, sizeof(hex), "\\x%02X", (unsigned char)str[i]);
 pc += prints(out, hex, width, pad);
-} 
-else 
+}
+else
 {
 printchar(out, str[i]);
 pc++;
@@ -292,7 +363,7 @@ pc++;
 }
 continue;
 }
-
+if (*fmt == 'l' && *(fmt + 1) == 'd') {                 long d = va_arg(args, long);                            pc += printi(out, d, 10, 1, width, pad, 'a');           fmt++;                                                  continue;                                               }
 printchar(out, '%');
 printchar(out, *fmt);
 pc += 2;
